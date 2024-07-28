@@ -57,6 +57,69 @@ app.post("/signin", (req, res) => {
     ).catch()
 
 })
+app.post("/add",async(req,res)=>{
+    let input=req.body
+    let token=req.headers.token
+    jwt.verify(token,"blogg-app",async(error,decoded)=>{
+        if(decoded && decoded.email){
+            let result=new postModel(input)
+            await result.save()
+            res.json({"status":"success"})
+        }
+        else
+        {
+            res.json({"status":"Invalid Authentication"})
+        }
+    })
+})
+
+
+
+app.post("/viewall",(req,res)=>{
+    let token=req.headers.token
+    jwt.verify(token,"blogg-app",(error,decoded)=>{
+        if(decoded && decoded.email){
+            postModel.find().then(
+                (items)=>{
+                    res.json(items)
+                }
+            ).catch(
+                (error)=>{
+                    res.json({"status":"error"})
+                }
+            )
+            
+        }
+        else
+        {
+            res.json({"status":"Invalid Authentication"})
+        }
+    })
+})
+
+app.post("/viewmypost",(req,res)=>{
+    let input=req.body
+    let token=req.headers.token
+    jwt.verify(token,"blogg-app",(error,decoded)=>{
+        if(decoded && decoded.email){
+            postModel.find(input).then(
+                (items)=>{
+                    res.json(items)
+                }
+            ).catch(
+                (error)=>{
+                    res.json({"status":"error"})
+                }
+            )
+            
+        }
+        else
+        {
+            res.json({"status":"Invalid Authentication"})
+        }
+    })
+})
+
 app.listen(8080,()=>{
     console.log("server started")
 })
